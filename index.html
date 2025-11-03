@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我们的故事</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind自定义颜色和字体 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            love: {
+              light: '#FFD1DC',
+              DEFAULT: '#FF69B4',
+              dark: '#C71585',
+              purple: '#DDA0DD'
+            }
+          },
+          fontFamily: {
+            romantic: ['"Dancing Script"', 'cursive', 'sans-serif'],
+            lyric: ['"Noto Serif SC"', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .heart-beat {
+        animation: heartbeat 1.5s ease-in-out infinite;
+      }
+      .float {
+        animation: float 6s ease-in-out infinite;
+      }
+      .fade-in {
+        animation: fadeIn 1.5s ease-in forwards;
+      }
+      .slide-up {
+        animation: slideUp 1s ease-out forwards;
+      }
+      .lyric-fade {
+        animation: lyricFade 0.8s ease-in-out forwards;
+      }
+    }
+    
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      14% { transform: scale(1.1); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.1); }
+      70% { transform: scale(1); }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes lyricFade {
+      from { opacity: 0.3; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+  
+  <!-- 引入字体 -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-b from-pink-50 to-purple-50 min-h-screen overflow-x-hidden">
+  <!-- 更换为永久稳定的音频源（网易云音乐外链） -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="二珂 - 告白气球.mp3" type="audio/mpeg">
+  </audio>
+  
+  <!-- 漂浮爱心元素 -->
+  <div id="hearts-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <!-- 页面标题 -->
+  <header class="relative pt-20 pb-16 px-6 text-center z-10">
+    <h1 class="font-romantic text-[clamp(2.5rem,6vw,4rem)] text-love-dark font-bold mb-4 text-shadow fade-in">
+      我们的故事
+    </h1>
+    <p class="font-romantic text-[clamp(1.5rem,3vw,2rem)] text-love-purple fade-in" style="animation-delay: 0.5s">
+      从遇见你的那一天起
+    </p>
+    <div class="mt-8 flex justify-center">
+      <i class="fa fa-heart text-love text-4xl heart-beat"></i>
+    </div>
+    <p id="playTip" class="mt-4 text-gray-500 text-sm fade-in" style="animation-delay: 1s">
+      点击页面任意位置开启浪漫旋律 ❤️
+    </p>
+  </header>
+
+  <!-- 歌词显示区 -->
+  <section class="relative z-10 max-w-2xl mx-auto px-6 mb-16 opacity-0" id="lyrics-section">
+    <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-pink-100">
+      <h2 class="font-romantic text-[clamp(1.5rem,3vw,2rem)] text-love-dark text-center mb-6">
+        告白气球
+      </h2>
+      <div id="lyrics-container" class="h-48 md:h-64 overflow-hidden flex items-center justify-center">
+        <div id="lyrics-wrapper" class="text-center transition-transform duration-300">
+          <!-- 歌词会通过JS动态插入 -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主内容区 -->
+  <main class="relative z-10 max-w-4xl mx-auto px-6 pb-20">
+    <!-- 时间线介绍 -->
+    <section class="mb-20 opacity-0" id="intro">
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-pink-100">
+        <p class="font-romantic text-[clamp(1.2rem,3vw,1.8rem)] text-gray-700 leading-relaxed text-center">
+          不知不觉，我们已经走过了这么多个春夏秋冬。
+          每一个平凡的日子，因为有你而变得特别。
+          感谢你出现在我的生命里，成为我最温暖的港湾。
+        </p>
+      </div>
+    </section>
+
+    <!-- 照片展示区（图片链接已正确设置） -->
+    <section class="mb-20 opacity-0" id="photos">
+      <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
+        珍贵的回忆
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
+          <img src="https://imgtu.com/uploads/5hcg7sxi/r-pasted-2025-11-03t12-28-53-203z.webp" 
+               alt="我们的回忆" 
+               class="w-full h-64 object-cover">
+        </div>
+        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
+          <img src="https://imgtu.com/uploads/5i5oyjmb/r-pasted-2025-11-03t12-46-28-026z.webp" 
+               alt="我们的回忆" 
+               class="w-full h-64 object-cover">
+        </div>
+        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
+          <img src="https://imgtu.com/uploads/5i5mqaux/r-pasted-2025-11-03t12-46-16-450z.webp" 
+               alt="我们的回忆" 
+               class="w-full h-64 object-cover">
+        </div>
+        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
+          <img src="https://imgtu.com/uploads/5i5q9me4/r-pasted-2025-11-03t12-46-30-219z.webp" 
+               alt="我们的回忆" 
+               class="w-full h-64 object-cover">
+        </div>
+      </div>
+    </section>
+
+    <!-- 时间线与故事 -->
+    <section class="mb-20 opacity-0" id="timeline">
+      <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
+        爱的轨迹
+      </h2>
+      
+      <div class="relative">
+        <!-- 时间线中轴线 -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-love-light rounded-full"></div>
+        
+        <!-- 时间点1 -->
+        <div class="relative mb-16">
+          <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 md:pr-12 md:text-right mb-6 md:mb-0 order-2 md:order-1">
+              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
+                <h3 class="font-romantic text-xl text-love-dark mb-2">第一次相遇</h3>
+                <p class="text-gray-700">
+                  还记得那天的阳光吗？你穿着简单的白衬衫，笑容像孩子一样纯净。
+                  那一刻，我就知道，我的生命里会多一个特别的人。
+                </p>
+              </div>
+            </div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
+            <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
+          </div>
+        </div>
+        
+        <!-- 时间点2 -->
+        <div class="relative mb-16">
+          <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
+            <div class="md:w-1/2 md:pl-12">
+              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
+                <h3 class="font-romantic text-xl text-love-dark mb-2">第一次牵手</h3>
+                <p class="text-gray-700">
+                  手心的温度至今还记得，有点紧张，有点羞涩，
+                  但更多的是一种安心的感觉，仿佛找到了可以依靠的港湾。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 时间点3 -->
+        <div class="relative mb-16">
+          <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 md:pr-12 md:text-right mb-6 md:mb-0 order-2 md:order-1">
+              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
+                <h3 class="font-romantic text-xl text-love-dark mb-2">第一个纪念日</h3>
+                <p class="text-gray-700">
+                  时间过得真快，一年就这么过去了。
+                  我们一起经历了欢笑和泪水，每一个瞬间都值得珍藏。
+                </p>
+              </div>
+            </div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
+            <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
+          </div>
+        </div>
+        
+        <!-- 时间点4 -->
+        <div class="relative">
+          <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
+            <div class="md:w-1/2 md:pl-12">
+              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
+                <h3 class="font-romantic text-xl text-love-dark mb-2">直到今天</h3>
+                <p class="text-gray-700">
+                  不知不觉，我们已经走过了这么多年。
+                  未来还有很长的路要走，我想一直牵着你的手，
+                  看遍世间风景，直到岁月尽头。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 情书区域 -->
+    <section class="opacity-0" id="love-letter">
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-pink-100">
+        <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-6">
+          给你的情书
+        </h2>
+        <p class="font-romantic text-[clamp(1.2rem,3vw,1.6rem)] text-gray-700 leading-relaxed mb-4">
+          亲爱的，
+        </p>
+        <p class="font-romantic text-[clamp(1.1rem,2vw,1.4rem)] text-gray-700 leading-relaxed mb-4">
+          写这封信的时候，窗外的月光正好洒进来，像极了我们第一次约会的那个晚上。
+          回想我们一起走过的这些年，有欢笑，有争吵，有感动，有成长。
+          谢谢你包容我的不完美，谢谢你在我迷茫的时候给我指引，
+          谢谢你成为我生命中最温暖的光。
+        </p>
+        <p class="font-romantic text-[clamp(1.1rem,2vw,1.4rem)] text-gray-700 leading-relaxed mb-4">
+          爱情或许不总是轰轰烈烈，更多的是柴米油盐中的相濡以沫，
+          是平淡日子里的相视一笑，是疲惫时的一个拥抱。
+          这些平凡的瞬间，构成了我们最珍贵的回忆。
+        </p>
+        <p class="font-romantic text-[clamp(1.1rem,2vw,1.4rem)] text-gray-700 leading-relaxed">
+          未来还有无数个春夏秋冬等着我们一起度过，
+          我想和你一起看日出日落，一起慢慢变老。
+          我爱你，不止今天，而是往后余生的每一天。
+        </p>
+        <p class="font-romantic text-[clamp(1.2rem,3vw,1.6rem)] text-love-dark text-right mt-8">
+          永远爱你的人
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="relative z-10 py-8 text-center text-gray-500 text-sm">
+    <p>用爱编织的时光 &copy; 2025</p>
+    <button id="musicToggle" class="mt-4 text-love hover:text-love-dark transition-colors">
+      <i class="fa fa-pause mr-1"></i> 暂停音乐
+    </button>
+  </footer>
+
+  <script>
+    // 《告白气球》歌词带时间戳
+    const lyrics = [
+      { time: 0, text: "塞纳河畔 左岸的咖啡" },
+      { time: 2.5, text: "我手一杯 品尝你的美" },
+      { time: 5.5, text: "留下唇印的嘴" },
+      { time: 8.5, text: "" },
+      { time: 9, text: "花店玫瑰 名字写错谁" },
+      { time: 11.5, text: "告白气球 风吹到对街" },
+      { time: 14.5, text: "微笑在天上飞" },
+      { time: 17.5, text: "" },
+      { time: 18, text: "你说你有点难追 想让我知难而退" },
+      { time: 23, text: "礼物不需挑最贵 只要香榭的落叶" },
+      { time: 28, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
+      { time: 33, text: "拥有你就拥有 全世界" },
+      { time: 37, text: "" },
+      { time: 38, text: "亲爱的 爱上你 从那天起" },
+      { time: 43, text: "甜蜜的很轻易" },
+      { time: 46, text: "亲爱的 别任性 你的眼睛" },
+      { time: 51, text: "在说我愿意" },
+      { time: 55, text: "" },
+      { time: 56, text: "塞纳河畔 左岸的咖啡" },
+      { time: 58.5, text: "我手一杯 品尝你的美" },
+      { time: 61.5, text: "留下唇印的嘴" },
+      { time: 64.5, text: "" },
+      { time: 65, text: "花店玫瑰 名字写错谁" },
+      { time: 67.5, text: "告白气球 风吹到对街" },
+      { time: 70.5, text: "微笑在天上飞" },
+      { time: 73.5, text: "" },
+      { time: 74, text: "你说你有点难追 想让我知难而退" },
+      { time: 79, text: "礼物不需挑最贵 只要香榭的落叶" },
+      { time: 84, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
+      { time: 89, text: "拥有你就拥有 全世界" },
+      { time: 93, text: "" },
+      { time: 94, text: "亲爱的 爱上你 从那天起" },
+      { time: 99, text: "甜蜜的很轻易" },
+      { time: 102, text: "亲爱的 别任性 你的眼睛" },
+      { time: 107, text: "在说我愿意" },
+      { time: 111, text: "" },
+      { time: 118, text: "亲爱的 爱上你 恋爱日记" },
+      { time: 123, text: "飘香水的回忆" },
+      { time: 126, text: "一整瓶 的梦境 全都有你" },
+      { time: 131, text: "搅拌在一起" },
+      { time: 135, text: "" },
+      { time: 142, text: "亲爱的 别任性 你的眼睛" },
+      { time: 147, text: "在说我愿意" }
+    ];
+
+    // 漂浮爱心功能
+    function createHearts() {
+      const container = document.getElementById('hearts-container');
+      const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#FFC0CB', '#FF1493'];
+      
+      setInterval(() => {
+        const heart = document.createElement('div');
+        heart.innerHTML = '<i class="fa fa-heart"></i>';
+        heart.className = 'absolute text-2xl opacity-70 float';
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.top = '100vh';
+        heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+        heart.style.animationDuration = `${5 + Math.random() * 10}s`;
+        heart.style.opacity = Math.random() * 0.7 + 0.3;
+        heart.style.fontSize = `${12 + Math.random() * 24}px`;
+        heart.style.zIndex = '0';
+        
+        container.appendChild(heart);
+        setTimeout(() => heart.remove(), 15000);
+      }, 800);
+    }
+    
+    // 滚动动画
+    function setupScrollAnimations() {
+      const sections = ['lyrics-section', 'intro', 'photos', 'timeline', 'love-letter'];
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('slide-up');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) observer.observe(section);
+      });
+    }
+    
+    // 歌词同步
+    function setupLyrics() {
+      const music = document.getElementById('bgMusic');
+      const lyricsWrapper = document.getElementById('lyrics-wrapper');
+      const lyricsContainer = document.getElementById('lyrics-container');
+      
+      lyrics.forEach((lyric, index) => {
+        const lyricEl = document.createElement('div');
+        lyricEl.className = `py-2 text-gray-700 font-lyric text-[clamp(1rem,2vw,1.2rem)] opacity-30 transition-opacity`;
+        lyricEl.textContent = lyric.text;
+        lyricEl.dataset.index = index;
+        lyricsWrapper.appendChild(lyricEl);
+      });
+      
+      const lyricElements = document.querySelectorAll('#lyrics-wrapper > div');
+      let currentIndex = -1;
+      
+      music.addEventListener('timeupdate', () => {
+        const currentTime = music.currentTime;
+        for (let i = 0; i < lyrics.length; i++) {
+          if (lyrics[i].time <= currentTime && (i === lyrics.length - 1 || lyrics[i + 1].time > currentTime)) {
+            if (i !== currentIndex) {
+              if (currentIndex !== -1) {
+                lyricElements[currentIndex].classList.remove('opacity-100', 'text-love-dark', 'font-bold', 'lyric-fade');
+                lyricElements[currentIndex].classList.add('opacity-30');
+              }
+              
+              currentIndex = i;
+              lyricElements[currentIndex].classList.remove('opacity-30');
+              lyricElements[currentIndex].classList.add('opacity-100', 'text-love-dark', 'font-bold', 'lyric-fade');
+              
+              const containerHeight = lyricsContainer.clientHeight;
+              const lyricHeight = lyricElements[currentIndex].clientHeight;
+              const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
+              lyricsWrapper.style.transform = `translateY(-${scrollTop}px)`;
+            }
+            break;
+          }
+        }
+      });
+    }
+    
+    // 音乐播放优化（解决播放失败问题）
+    function setupMusic() {
+      const music = document.getElementById('bgMusic');
+      const toggleBtn = document.getElementById('musicToggle');
+      const playTip = document.getElementById('playTip');
+      let isPlaying = false;
+      let hasInteracted = false;
+
+      // 强制用户交互后播放（浏览器安全政策要求）
+      function ensurePlay() {
+        music.play().then(() => {
+          isPlaying = true;
+          hasInteracted = true;
+          playTip.style.display = 'none';
+          toggleBtn.innerHTML = '<i class="fa fa-pause mr-1"></i> 暂停音乐';
+        }).catch(err => {
+          console.log('播放需要用户交互:', err);
+          playTip.style.display = 'block';
+        });
+      }
+
+      // 页面加载后不自动播放，仅提示用户点击（避免浏览器拦截）
+      playTip.style.display = 'block';
+
+      // 点击页面任意位置触发播放
+      document.addEventListener('click', () => {
+        if (!hasInteracted) {
+          ensurePlay();
+        }
+      }, { once: true });
+
+      // 播放/暂停按钮
+      toggleBtn.addEventListener('click', () => {
+        if (isPlaying) {
+          music.pause();
+          toggleBtn.innerHTML = '<i class="fa fa-music mr-1"></i> 播放音乐';
+        } else {
+          music.play();
+          toggleBtn.innerHTML = '<i class="fa fa-pause mr-1"></i> 暂停音乐';
+        }
+        isPlaying = !isPlaying;
+      });
+    }
+    
+    // 图片替换功能
+    function setupPhotoReplacement() {
+      const photos = document.querySelectorAll('#photos img');
+      photos.forEach(photo => {
+        photo.addEventListener('click', () => {
+          const newSrc = prompt("请输入图片链接（支持路过图床链接）：");
+          if (newSrc) {
+            photo.src = newSrc;
+            alert('替换成功！若未显示，请刷新页面');
+          }
+        });
+      });
+    }
+    
+    // 初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      createHearts();
+      setupScrollAnimations();
+      setupLyrics();
+      setupMusic();
+      setupPhotoReplacement();
+    });
+  </script>
+</body>
+</html>
