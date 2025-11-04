@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我们的故事</title>
+  <title>告白气球 - 我们的故事</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-  <!-- 配置Tailwind自定义颜色和字体 -->
+  <!-- 配置Tailwind：统一响应式布局类 -->
   <script>
     tailwind.config = {
       theme: {
@@ -17,7 +17,8 @@
               light: '#FFD1DC',
               DEFAULT: '#FF69B4',
               dark: '#C71585',
-              purple: '#DDA0DD'
+              purple: '#DDA0DD',
+              faded: '#F8BBD0'
             }
           },
           fontFamily: {
@@ -46,8 +47,11 @@
       .slide-up {
         animation: slideUp 1s ease-out forwards;
       }
-      .lyric-fade {
-        animation: lyricFade 0.8s ease-in-out forwards;
+      .lyric-active {
+        animation: lyricPulse 0.8s ease-in-out forwards;
+      }
+      .pulse {
+        animation: pulse 2s infinite;
       }
     }
     
@@ -75,26 +79,29 @@
       to { transform: translateY(0); opacity: 1; }
     }
     
-    @keyframes lyricFade {
-      from { opacity: 0.3; transform: scale(0.95); }
+    @keyframes lyricPulse {
+      from { opacity: 0.7; transform: scale(0.98); }
       to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
   </style>
   
-  <!-- 引入字体 -->
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body class="bg-gradient-to-b from-pink-50 to-purple-50 min-h-screen overflow-x-hidden">
-  <!-- 音乐链接已修改为你的仓库路径（确保love.mp3已上传到仓库根目录） -->
   <audio id="bgMusic" loop preload="auto">
-   <source src="https://13703897128.github.io/lovestory.github.io/love.mp3" type="audio/mpeg">
-</audio>
+    <source src="https://13703897128.github.io/lovestory.github.io/love.mp3" type="audio/mpeg">
+  </think>
   
-  <!-- 漂浮爱心元素 -->
   <div id="hearts-container" class="fixed inset-0 pointer-events-none z-0"></div>
+  <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-0"></div>
 
-  <!-- 页面标题 -->
   <header class="relative pt-20 pb-16 px-6 text-center z-10">
     <h1 class="font-romantic text-[clamp(2.5rem,6vw,4rem)] text-love-dark font-bold mb-4 text-shadow fade-in">
       我们的故事
@@ -105,233 +112,203 @@
     <div class="mt-8 flex justify-center">
       <i class="fa fa-heart text-love text-4xl heart-beat"></i>
     </div>
-    <!-- 提示用户点击页面（若自动播放失败） -->
     <p id="playTip" class="mt-4 text-gray-500 text-sm fade-in" style="animation-delay: 1s">
       点击页面任意位置开启浪漫旋律 ❤️
     </p>
   </header>
 
-  <!-- 歌词显示区 -->
-  <section class="relative z-10 max-w-2xl mx-auto px-6 mb-16 opacity-0" id="lyrics-section">
-    <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-pink-100">
-      <h2 class="font-romantic text-[clamp(1.5rem,3vw,2rem)] text-love-dark text-center mb-6">
-        告白气球
-      </h2>
-      <div id="lyrics-container" class="h-48 md:h-64 overflow-hidden flex items-center justify-center">
-        <div id="lyrics-wrapper" class="text-center transition-transform duration-300">
-          <!-- 歌词会通过JS动态插入 -->
-        </div>
+  <section class="relative z-10 max-w-3xl mx-auto px-6 mb-16 opacity-0" id="song-info">
+    <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-pink-100 flex flex-col items-center gap-8">
+      <div class="w-48 h-48 rounded-xl overflow-hidden shadow-xl pulse">
+        <img src="https://picsum.photos/id/1069/300/300" alt="告白气球专辑封面" class="w-full h-full object-cover">
+      </div>
+      <div class="text-center">
+        <h2 id="song-title" class="font-romantic text-[clamp(2rem,5vw,3rem)] text-love-dark font-bold mb-2">
+          告白气球
+        </h2>
+        <p class="text-gray-600 mb-4">床边故事</p>
+        <p class="text-gray-500 text-sm max-w-md">
+          这首歌像一封粉色的情书，记录着塞纳河畔的浪漫邂逅。前奏响起时，仿佛能看到气球飘过街角，而你的笑容比阳光更耀眼。
+        </p>
+        <p id="intro-tip" class="mt-4 text-love text-sm hidden">
+          <i class="fa fa-music mr-1"></i> 前奏中... 故事即将开始
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- 主内容区 -->
-  <main class="relative z-10 max-w-4xl mx-auto px-6 pb-20">
-    <!-- 时间线介绍 -->
-    <section class="mb-20 opacity-0" id="intro">
-      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-pink-100">
-        <p class="font-romantic text-[clamp(1.2rem,3vw,1.8rem)] text-gray-700 leading-relaxed text-center">
-          不知不觉，我们已经走过了这么多个春夏秋冬。
-          每一个平凡的日子，因为有你而变得特别。
-          感谢你出现在我的生命里，成为我最温暖的港湾。
-        </p>
-      </div>
-    </section>
-
-    <!-- 照片展示区（支持路过图床替换） -->
-    <section class="mb-20 opacity-0" id="photos">
-      <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
-        珍贵的回忆
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://picsum.photos/id/1025/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
-        </div>
-        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://picsum.photos/id/1062/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
-        </div>
-        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://picsum.photos/id/1082/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
-        </div>
-        <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://picsum.photos/id/177/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
+  <section class="relative z-10 max-w-2xl mx-auto px-6 mb-16 opacity-0" id="lyrics-section">
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-pink-100">
+      <div id="lyrics-container" class="h-64 md:h-80 overflow-hidden flex items-center justify-center">
+        <div id="lyrics-wrapper" class="text-center transition-transform duration-300 w-full">
+          <!-- 歌词会通过JS动态插入 -->
         </div>
       </div>
-      <p class="text-center text-gray-500 mt-4 text-sm">
-        （点击照片可替换为你们的回忆，推荐使用路过图床获取图片链接）
-      </p>
-    </section>
-
-    <!-- 时间线与故事 -->
-    <section class="mb-20 opacity-0" id="timeline">
-      <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
-        爱的轨迹
-      </h2>
-      
-      <div class="relative">
-        <!-- 时间线中轴线 -->
-        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-love-light rounded-full"></div>
-        
-        <!-- 时间点1 -->
-        <div class="relative mb-16">
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 md:pr-12 md:text-right mb-6 md:mb-0 order-2 md:order-1">
-              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
-                <h3 class="font-romantic text-xl text-love-dark mb-2">第一次相遇</h3>
-                <p class="text-gray-700">
-                  还记得那天的阳光吗？你穿着简单的白衬衫，笑容像孩子一样纯净。
-                  那一刻，我就知道，我的生命里会多一个特别的人。
-                </p>
-              </div>
-            </div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
-            <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
-          </div>
-        </div>
-        
-        <!-- 时间点2 -->
-        <div class="relative mb-16">
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0"></div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
-            <div class="md:w-1/2 md:pl-12">
-              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
-                <h3 class="font-romantic text-xl text-love-dark mb-2">第一次牵手</h3>
-                <p class="text-gray-700">
-                  手心的温度至今还记得，有点紧张，有点羞涩，
-                  但更多的是一种安心的感觉，仿佛找到了可以依靠的港湾。
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 时间点3 -->
-        <div class="relative mb-16">
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 md:pr-12 md:text-right mb-6 md:mb-0 order-2 md:order-1">
-              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
-                <h3 class="font-romantic text-xl text-love-dark mb-2">第一个纪念日</h3>
-                <p class="text-gray-700">
-                  时间过得真快，一年就这么过去了。
-                  我们一起经历了欢笑和泪水，每一个瞬间都值得珍藏。
-                </p>
-              </div>
-            </div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
-            <div class="md:w-1/2 md:pl-12 order-1 md:order-2"></div>
-          </div>
-        </div>
-        
-        <!-- 时间点4 -->
-        <div class="relative">
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 md:pr-12 mb-6 md:mb-0"></div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-love z-10"></div>
-            <div class="md:w-1/2 md:pl-12">
-              <div class="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-pink-100">
-                <h3 class="font-romantic text-xl text-love-dark mb-2">直到今天</h3>
-                <p class="text-gray-700">
-                  不知不觉，我们已经走过了这么多年。
-                  未来还有很长的路要走，我想一直牵着你的手，
-                  看遍世间风景，直到岁月尽头。
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="mt-6 relative h-1 bg-gray-200 rounded-full overflow-hidden">
+        <div id="progress-bar" class="absolute top-0 left-0 h-full bg-love transition-all duration-300" style="width: 0%"></div>
       </div>
-    </section>
+      <div class="flex justify-between text-xs text-gray-500 mt-2">
+        <span id="current-time">00:00</span>
+        <span id="total-time">00:00</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- 情书区域 -->
-    <section class="opacity-0" id="love-letter">
-      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-pink-100">
-        <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-6">
-          给你的情书
-        </h2>
-        <p class="font-romantic text-[clamp(1.2rem,3vw,1.6rem)] text-gray-700 leading-relaxed mb-4">
-          亲爱的，
-        </p>
-        <p class="font-romantic text-[clamp(1.1rem,2vw,1.4rem)] text-gray-700 leading-relaxed mb-4">
-          写这封信的时候，窗外的月光正好洒进来，像极了我们第一次约会的那个晚上。
-          回想我们一起走过的这些年，有欢笑，有争吵，有感动，有成长。
-          谢谢你包容我的不完美，谢谢你在我迷茫的时候给我指引，
-          谢谢你成为我生命中最温暖的光。
-        </p>
-        <p class="font-romantic text-[clamp(1.1rem,2vw,1.4rem)] text-gray-700 leading-relaxed mb-4">
-          爱情或许不总是轰轰烈烈，更多的是柴米油盐中的相濡以沫，
-          是平淡日子里的相视一笑，是疲惫时的一个拥抱。
-          这些平凡的瞬间，构成了我们最珍贵的回忆。
-        </p>
-        <p class="font-romantic text-[clamp(1.1rem,2vw,1.4rem)] text-gray-700 leading-relaxed">
-          未来还有无数个春夏秋冬等着我们一起度过，
-          我想和你一起看日出日落，一起慢慢变老。
-          我爱你，不止今天，而是往后余生的每一天。
-        </p>
-        <p class="font-romantic text-[clamp(1.2rem,3vw,1.6rem)] text-love-dark text-right mt-8">
-          永远爱你的人
+  <section class="relative z-10 max-w-4xl mx-auto px-6 mb-20 opacity-0" id="lyric-story">
+    <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
+      歌词里的故事
+    </h2>
+    <div class="grid grid-cols-1 gap-8">
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100">
+        <h3 class="font-romantic text-xl text-love-dark mb-4 flex items-center justify-center">
+          <i class="fa fa-map-marker mr-2"></i> 塞纳河畔的邂逅
+        </h3>
+        <p class="text-gray-700 leading-relaxed text-center">
+          "塞纳河畔 左岸的咖啡" —— 第一次和你去咖啡馆，你点了不加糖的拿铁，说这样才能尝到最纯粹的味道。阳光透过玻璃窗落在你发梢，那一刻，时间仿佛停住了。
         </p>
       </div>
-    </section>
-  </main>
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100">
+        <h3 class="font-romantic text-xl text-love-dark mb-4 flex items-center justify-center">
+          <i class="fa fa-gift mr-2"></i> 不昂贵的浪漫
+        </h3>
+        <p class="text-gray-700 leading-relaxed text-center">
+          "礼物不需挑最贵 只要香榭的落叶" —— 你说最喜欢秋天，于是我捡了一袋梧桐叶，在每片叶子上写一句情话送给你。你笑着说，这是收到过最珍贵的礼物。
+        </p>
+      </div>
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100">
+        <h3 class="font-romantic text-xl text-love-dark mb-4 flex items-center justify-center">
+          <i class="fa fa-heart mr-2"></i> 爱上你的瞬间
+        </h3>
+        <p class="text-gray-700 leading-relaxed text-center">
+          "亲爱的 爱上你 从那天起" —— 记得那天你穿着白衬衫，在图书馆帮我捡起掉落的书。对视的一秒，心跳突然乱了节拍。原来喜欢一个人，真的会有生理反应。
+        </p>
+      </div>
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100">
+        <h3 class="font-romantic text-xl text-love-dark mb-4 flex items-center justify-center">
+          <i class="fa fa-eye mr-2"></i> 你的眼睛会说话
+        </h3>
+        <p class="text-gray-700 leading-relaxed text-center">
+          "亲爱的 别任性 你的眼睛 在说我愿意" —— 第一次牵你的手，你没有说话，但眼睛里的羞涩和温柔，已经告诉我答案。原来喜欢一个人，眼神是藏不住的。
+        </p>
+      </div>
+    </div>
+  </section>
 
-  <!-- 页脚 -->
+  <section class="relative z-10 max-w-5xl mx-auto px-6 mb-20 opacity-0" id="photos">
+    <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
+      我们的浪漫碎片
+    </h2>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/1025/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/1062/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/1082/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/177/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/237/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/325/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/433/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+      <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 hover:shadow-xl">
+        <img src="https://picsum.photos/id/554/300/300" alt="我们的回忆" class="w-full h-48 object-cover">
+      </div>
+    </div>
+    <p class="text-center text-gray-500 mt-6 text-sm">
+      （点击照片可替换为你们的回忆，推荐使用路过图床获取图片链接）
+    </p>
+  </section>
+
+  <section class="relative z-10 max-w-4xl mx-auto px-6 mb-20 opacity-0" id="love-quotes">
+    <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
+      藏在时光里的情话
+    </h2>
+    <div class="grid grid-cols-1 gap-6">
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 transform transition-all hover:-translate-y-2 hover:shadow-xl">
+        <p class="font-romantic text-[clamp(1rem,2vw,1.2rem)] text-gray-700 italic text-center">
+          "你笑起来的时候，我觉得整个世界都变成了粉红色。"
+        </p>
+        <p class="text-right text-love text-sm mt-4">—— 第一次约会后</p>
+      </div>
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 transform transition-all hover:-translate-y-2 hover:shadow-xl">
+        <p class="font-romantic text-[clamp(1rem,2vw,1.2rem)] text-gray-700 italic text-center">
+          "想和你一起吃很多很多顿饭，从早餐的豆浆油条到深夜的火锅。"
+        </p>
+        <p class="text-right text-love text-sm mt-4">—— 相识第100天</p>
+      </div>
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-100 transform transition-all hover:-translate-y-2 hover:shadow-xl">
+        <p class="font-romantic text-[clamp(1rem,2vw,1.2rem)] text-gray-700 italic text-center">
+          "未来的路很长，但只要身边是你，我就什么都不怕。"
+        </p>
+        <p class="text-right text-love text-sm mt-4">—— 某个下雨的夜晚</p>
+      </div>
+    </div>
+  </section>
+
   <footer class="relative z-10 py-8 text-center text-gray-500 text-sm">
-    <p>用爱编织的时光 &copy; 2023</p>
+    <p>用爱编织的时光 &copy; 2025</p>
     <button id="musicToggle" class="mt-4 text-love hover:text-love-dark transition-colors">
       <i class="fa fa-pause mr-1"></i> 暂停音乐
     </button>
   </footer>
 
   <script>
-    // 《告白气球》歌词带时间戳（秒）
     const lyrics = [
-      { time: 0, text: "塞纳河畔 左岸的咖啡" },
-      { time: 2.5, text: "我手一杯 品尝你的美" },
-      { time: 5.5, text: "留下唇印的嘴" },
-      { time: 8.5, text: "" },
-      { time: 9, text: "花店玫瑰 名字写错谁" },
-      { time: 11.5, text: "告白气球 风吹到对街" },
-      { time: 14.5, text: "微笑在天上飞" },
-      { time: 17.5, text: "" },
-      { time: 18, text: "你说你有点难追 想让我知难而退" },
-      { time: 23, text: "礼物不需挑最贵 只要香榭的落叶" },
-      { time: 28, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
-      { time: 33, text: "拥有你就拥有 全世界" },
-      { time: 37, text: "" },
-      { time: 38, text: "亲爱的 爱上你 从那天起" },
-      { time: 43, text: "甜蜜的很轻易" },
-      { time: 46, text: "亲爱的 别任性 你的眼睛" },
-      { time: 51, text: "在说我愿意" },
-      { time: 55, text: "" },
-      { time: 56, text: "塞纳河畔 左岸的咖啡" },
-      { time: 58.5, text: "我手一杯 品尝你的美" },
-      { time: 61.5, text: "留下唇印的嘴" },
-      { time: 64.5, text: "" },
-      { time: 65, text: "花店玫瑰 名字写错谁" },
-      { time: 67.5, text: "告白气球 风吹到对街" },
-      { time: 70.5, text: "微笑在天上飞" },
-      { time: 73.5, text: "" },
-      { time: 74, text: "你说你有点难追 想让我知难而退" },
-      { time: 79, text: "礼物不需挑最贵 只要香榭的落叶" },
-      { time: 84, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
-      { time: 89, text: "拥有你就拥有 全世界" },
-      { time: 93, text: "" },
-      { time: 94, text: "亲爱的 爱上你 从那天起" },
-      { time: 99, text: "甜蜜的很轻易" },
-      { time: 102, text: "亲爱的 别任性 你的眼睛" },
-      { time: 107, text: "在说我愿意" },
-      { time: 111, text: "" },
-      { time: 118, text: "亲爱的 爱上你 恋爱日记" },
-      { time: 123, text: "飘香水的回忆" },
-      { time: 126, text: "一整瓶 的梦境 全都有你" },
-      { time: 131, text: "搅拌在一起" },
-      { time: 135, text: "" },
-      { time: 142, text: "亲爱的 别任性 你的眼睛" },
-      { time: 147, text: "在说我愿意" }
+      { time: 3, text: "塞纳河畔 左岸的咖啡" },
+      { time: 5.5, text: "我手一杯 品尝你的美" },
+      { time: 8.5, text: "留下唇印的嘴" },
+      { time: 11.5, text: "" },
+      { time: 12, text: "花店玫瑰 名字写错谁" },
+      { time: 14.5, text: "告白气球 风吹到对街" },
+      { time: 17.5, text: "微笑在天上飞" },
+      { time: 20.5, text: "" },
+      { time: 21, text: "你说你有点难追 想让我知难而退" },
+      { time: 26, text: "礼物不需挑最贵 只要香榭的落叶" },
+      { time: 31, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
+      { time: 36, text: "拥有你就拥有 全世界" },
+      { time: 40, text: "" },
+      { time: 41, text: "亲爱的 爱上你 从那天起" },
+      { time: 46, text: "甜蜜的很轻易" },
+      { time: 49, text: "亲爱的 别任性 你的眼睛" },
+      { time: 54, text: "在说我愿意" },
+      { time: 58, text: "" },
+      { time: 59, text: "塞纳河畔 左岸的咖啡" },
+      { time: 61.5, text: "我手一杯 品尝你的美" },
+      { time: 64.5, text: "留下唇印的嘴" },
+      { time: 67.5, text: "" },
+      { time: 68, text: "花店玫瑰 名字写错谁" },
+      { time: 70.5, text: "告白气球 风吹到对街" },
+      { time: 73.5, text: "微笑在天上飞" },
+      { time: 76.5, text: "" },
+      { time: 77, text: "你说你有点难追 想让我知难而退" },
+      { time: 82, text: "礼物不需挑最贵 只要香榭的落叶" },
+      { time: 87, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
+      { time: 92, text: "拥有你就拥有 全世界" },
+      { time: 96, text: "" },
+      { time: 97, text: "亲爱的 爱上你 从那天起" },
+      { time: 102, text: "甜蜜的很轻易" },
+      { time: 105, text: "亲爱的 别任性 你的眼睛" },
+      { time: 110, text: "在说我愿意" },
+      { time: 114, text: "" },
+      { time: 121, text: "亲爱的 爱上你 恋爱日记" },
+      { time: 126, text: "飘香水的回忆" },
+      { time: 129, text: "一整瓶 的梦境 全都有你" },
+      { time: 134, text: "搅拌在一起" },
+      { time: 138, text: "" },
+      { time: 145, text: "亲爱的 别任性 你的眼睛" },
+      { time: 150, text: "在说我愿意" }
     ];
 
-    // 创建漂浮爱心
     function createHearts() {
       const container = document.getElementById('hearts-container');
       const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#FFC0CB', '#FF1493'];
@@ -350,16 +327,35 @@
         
         container.appendChild(heart);
         
-        // 移除超出屏幕的爱心
         setTimeout(() => {
           heart.remove();
         }, 15000);
       }, 800);
     }
+
+    function createBubbles() {
+      const container = document.getElementById('bubbles-container');
+      
+      setInterval(() => {
+        const bubble = document.createElement('div');
+        bubble.className = 'absolute rounded-full bg-white/30 backdrop-blur-sm float';
+        bubble.style.left = `${Math.random() * 100}vw`;
+        bubble.style.top = '100vh';
+        bubble.style.width = `${10 + Math.random() * 30}px`;
+        bubble.style.height = bubble.style.width;
+        bubble.style.animationDuration = `${8 + Math.random() * 15}s`;
+        bubble.style.zIndex = '0';
+        
+        container.appendChild(bubble);
+        
+        setTimeout(() => {
+          bubble.remove();
+        }, 20000);
+      }, 1200);
+    }
     
-    // 滚动动画
     function setupScrollAnimations() {
-      const sections = ['lyrics-section', 'intro', 'photos', 'timeline', 'love-letter'];
+      const sections = ['song-info', 'lyrics-section', 'lyric-story', 'photos', 'love-quotes'];
       
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -378,13 +374,14 @@
       });
     }
     
-    // 歌词同步功能
     function setupLyrics() {
       const music = document.getElementById('bgMusic');
       const lyricsWrapper = document.getElementById('lyrics-wrapper');
       const lyricsContainer = document.getElementById('lyrics-container');
+      const progressBar = document.getElementById('progress-bar');
+      const currentTimeEl = document.getElementById('current-time');
+      const totalTimeEl = document.getElementById('total-time');
       
-      // 初始化歌词DOM
       lyrics.forEach((lyric, index) => {
         const lyricEl = document.createElement('div');
         lyricEl.className = `py-2 text-gray-700 font-lyric text-[clamp(1rem,2vw,1.2rem)] opacity-30 transition-opacity`;
@@ -396,27 +393,29 @@
       const lyricElements = document.querySelectorAll('#lyrics-wrapper > div');
       let currentIndex = -1;
       
-      // 监听音乐播放进度
+      music.addEventListener('loadedmetadata', () => {
+        const totalTime = music.duration;
+        totalTimeEl.textContent = formatTime(totalTime);
+      });
+      
       music.addEventListener('timeupdate', () => {
         const currentTime = music.currentTime;
+        currentTimeEl.textContent = formatTime(currentTime);
+        progressBar.style.width = `${(currentTime / music.duration) * 100}%`;
         
-        // 找到当前应显示的歌词
         for (let i = 0; i < lyrics.length; i++) {
           if (lyrics[i].time <= currentTime && 
               (i === lyrics.length - 1 || lyrics[i + 1].time > currentTime)) {
             if (i !== currentIndex) {
-              // 重置上一句歌词样式
               if (currentIndex !== -1) {
-                lyricElements[currentIndex].classList.remove('opacity-100', 'text-love-dark', 'font-bold', 'lyric-fade');
-                lyricElements[currentIndex].classList.add('opacity-30');
+                lyricElements[currentIndex].classList.remove('opacity-100', 'text-love-dark', 'font-bold', 'lyric-active');
+                lyricElements[currentIndex].classList.add('opacity-30', 'text-faded');
               }
               
-              // 设置当前歌词样式
               currentIndex = i;
-              lyricElements[currentIndex].classList.remove('opacity-30');
-              lyricElements[currentIndex].classList.add('opacity-100', 'text-love-dark', 'font-bold', 'lyric-fade');
+              lyricElements[currentIndex].classList.remove('opacity-30', 'text-faded');
+              lyricElements[currentIndex].classList.add('opacity-100', 'text-love-dark', 'font-bold', 'lyric-active');
               
-              // 滚动到当前歌词（居中显示）
               const containerHeight = lyricsContainer.clientHeight;
               const lyricHeight = lyricElements[currentIndex].clientHeight;
               const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
@@ -428,20 +427,29 @@
       });
     }
     
-    // 音乐播放功能
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
     function setupMusic() {
       const music = document.getElementById('bgMusic');
       const toggleBtn = document.getElementById('musicToggle');
       const playTip = document.getElementById('playTip');
+      const introTip = document.getElementById('intro-tip');
       let isPlaying = false;
       let hasInteracted = false;
 
-      // 尝试自动播放
       function tryAutoPlay() {
         music.play().then(() => {
           isPlaying = true;
           hasInteracted = true;
           playTip.style.display = 'none';
+          introTip.style.display = 'block';
+          setTimeout(() => {
+            introTip.style.display = 'none';
+          }, 3000);
           toggleBtn.innerHTML = '<i class="fa fa-pause mr-1"></i> 暂停音乐';
         }).catch(err => {
           console.log('需用户交互后播放:', err);
@@ -449,24 +457,25 @@
         });
       }
 
-      // 页面加载后尝试自动播放
       tryAutoPlay();
 
-      // 点击页面任意位置触发播放
       document.addEventListener('click', () => {
         if (!hasInteracted) {
           music.play().then(() => {
             isPlaying = true;
             hasInteracted = true;
             playTip.style.display = 'none';
+            introTip.style.display = 'block';
+            setTimeout(() => {
+              introTip.style.display = 'none';
+            }, 3000);
             toggleBtn.innerHTML = '<i class="fa fa-pause mr-1"></i> 暂停音乐';
           }).catch(err => {
-            console.log('点击后播放失败，请检查love.mp3是否已上传:', err);
+            console.log('点击后播放失败:', err);
           });
         }
       }, { once: true });
 
-      // 切换播放/暂停
       toggleBtn.addEventListener('click', () => {
         if (isPlaying) {
           music.pause();
@@ -479,7 +488,6 @@
       });
     }
     
-    // 照片替换功能
     function setupPhotoReplacement() {
       const photos = document.querySelectorAll('#photos img');
       photos.forEach(photo => {
@@ -496,9 +504,9 @@
       });
     }
     
-    // 页面加载完成后初始化
     window.addEventListener('DOMContentLoaded', () => {
       createHearts();
+      createBubbles();
       setupScrollAnimations();
       setupLyrics();
       setupMusic();
@@ -507,5 +515,3 @@
   </script>
 </body>
 </html>
-
-
