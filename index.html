@@ -131,7 +131,7 @@
   <section class="relative z-10 max-w-3xl mx-auto px-6 mb-16 opacity-0" id="song-info">
     <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-pink-100 flex flex-col items-center gap-8">
       <div class="w-48 h-48 rounded-xl overflow-hidden shadow-xl pulse">
-        <img src="https://picsum.photos/id/1069/300/300" alt="告白气球专辑封面" class="w-full h-full object-cover">
+        <img src="https://13703897128.github.io/lovestory.github.io/love.mp3" alt="告白气球专辑封面" class="w-full h-full object-cover">
       </div>
       <div class="text-center">
         <h2 id="song-title" class="font-romantic text-[clamp(2rem,5vw,3rem)] text-love-dark font-bold mb-2">
@@ -323,9 +323,8 @@
   </footer>
 
   <script>
-    // 修复可能的加载问题，添加页面加载提示
     document.addEventListener('DOMContentLoaded', () => {
-      // 精准歌词时间点（确保24秒后开始对应歌词）
+      // 歌词时间点精确匹配（根据您提供的示例调整）
       const lyrics = [
         { time: 3, text: "塞纳河畔 左岸的咖啡" },
         { time: 5.5, text: "我手一杯 品尝你的美" },
@@ -453,7 +452,6 @@
       function setupScrollAnimations() {
         const sections = ['song-info', 'lyrics-section', 'love-story', 'photos', 'love-quotes'];
         
-        // 简单的降级方案，如果IntersectionObserver不支持
         if (!('IntersectionObserver' in window)) {
           sections.forEach(sectionId => {
             const section = document.getElementById(sectionId);
@@ -479,7 +477,7 @@
         });
       }
       
-      // 歌词同步设置
+      // 歌词同步设置 - 重点优化部分
       function setupLyrics() {
         const music = document.getElementById('bgMusic');
         const lyricsWrapper = document.getElementById('lyrics-wrapper');
@@ -491,14 +489,16 @@
         // 渲染歌词
         lyrics.forEach((lyric, index) => {
           const lyricEl = document.createElement('div');
-          lyricEl.className = `py-3 text-gray-700 font-lyric text-[clamp(1rem,2vw,1.2rem)] opacity-30 transition-opacity`;
+          lyricEl.className = `py-3 text-gray-400 font-lyric text-[clamp(1rem,2vw,1.2rem)] transition-all duration-300`;
           lyricEl.textContent = lyric.text;
           lyricEl.dataset.index = index;
+          lyricEl.dataset.time = lyric.time;
           lyricsWrapper.appendChild(lyricEl);
         });
         
         const lyricElements = document.querySelectorAll('#lyrics-wrapper > div');
         let currentIndex = -1;
+        let isPlaying = false;
         
         // 音频元数据加载完成后更新总时长
         music.addEventListener('loadedmetadata', () => {
@@ -506,34 +506,58 @@
           totalTimeEl.textContent = formatTime(totalTime);
         });
         
-        // 音频播放进度更新时同步歌词
+        // 监听播放状态变化
+        music.addEventListener('play', () => {
+          isPlaying = true;
+        });
+        
+        music.addEventListener('pause', () => {
+          isPlaying = false;
+        });
+        
+        // 音频播放进度更新时同步歌词 - 优化版
         music.addEventListener('timeupdate', () => {
+          // 只有在播放状态下才更新歌词
+          if (!isPlaying) return;
+          
           const currentTime = music.currentTime;
           currentTimeEl.textContent = formatTime(currentTime);
           progressBar.style.width = `${(currentTime / music.duration) * 100}%`;
           
           // 匹配当前时间对应的歌词
           for (let i = 0; i < lyrics.length; i++) {
-            if (lyrics[i].time <= currentTime && 
-                (i === lyrics.length - 1 || lyrics[i + 1].time > currentTime)) {
-              if (i !== currentIndex) {
-                // 更新上一句歌词样式
-                if (currentIndex !== -1) {
-                  lyricElements[currentIndex].classList.remove('opacity-100', 'text-love-dark', 'font-bold', 'lyric-active');
-                  lyricElements[currentIndex].classList.add('opacity-30', 'text-faded');
+            // 检查当前时间是否在当前歌词时间点之后，且在下一句之前
+            const isCurrentLyric = lyrics[i].time <= currentTime && 
+                                  (i === lyrics.length - 1 || currentTime < lyrics[i + 1].time);
+            
+            if (isCurrentLyric && i !== currentIndex) {
+              // 重置所有歌词样式
+              lyricElements.forEach(el => {
+                el.classList.remove('text-love-dark', 'font-bold', 'lyric-active', 'text-love');
+                el.classList.add('text-gray-400');
+              });
+              
+              // 更新已播放的歌词样式（前几句）
+              for (let j = 0; j < i; j++) {
+                if (lyricElements[j] && lyrics[j].text) {
+                  lyricElements[j].classList.remove('text-gray-400', 'text-love-dark', 'font-bold', 'lyric-active');
+                  lyricElements[j].classList.add('text-love'); // 已播放歌词用粉色
                 }
-                
-                // 更新当前句歌词样式
-                currentIndex = i;
-                lyricElements[currentIndex].classList.remove('opacity-30', 'text-faded');
-                lyricElements[currentIndex].classList.add('opacity-100', 'text-love-dark', 'font-bold', 'lyric-active');
-                
-                // 滚动歌词到可视区域
-                const containerHeight = lyricsContainer.clientHeight;
-                const lyricHeight = lyricElements[currentIndex].clientHeight;
-                const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
-                lyricsWrapper.style.transform = `translateY(-${scrollTop}px)`;
               }
+              
+              // 更新当前句歌词样式
+              currentIndex = i;
+              if (lyricElements[currentIndex] && lyrics[currentIndex].text) {
+                lyricElements[currentIndex].classList.remove('text-gray-400', 'text-love');
+                lyricElements[currentIndex].classList.add('text-love-dark', 'font-bold', 'lyric-active');
+              }
+              
+              // 滚动歌词到可视区域中央
+              const containerHeight = lyricsContainer.clientHeight;
+              const lyricHeight = lyricElements[currentIndex]?.clientHeight || 30;
+              const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
+              lyricsWrapper.style.transform = `translateY(-${scrollTop}px)`;
+              
               break;
             }
           }
