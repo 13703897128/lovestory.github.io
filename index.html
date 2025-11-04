@@ -35,21 +35,25 @@
         background: linear-gradient(135deg, #FFD1DC, #E6E6FA, #DDA0DD);
         background-size: 200% 200%;
       }
-      .text-gradient {
+      .text-gradient-unplayed {
         background-clip: text;
         -webkit-background-clip: text;
+        background-image: linear-gradient(to right, #9CA3AF, #B0BEC5);
         color: transparent;
       }
-      .lyric-char-unplayed {
-        background-image: linear-gradient(to right, #9CA3AF, #B0BEC5);
-      }
-      .lyric-char-playing {
+      .text-gradient-playing {
+        background-clip: text;
+        -webkit-background-clip: text;
         background-image: linear-gradient(to right, #E53E3E, #FF69B4);
+        color: transparent;
         font-weight: bold;
         animation: charPulse 0.3s ease-out;
       }
-      .lyric-char-played {
+      .text-gradient-played {
+        background-clip: text;
+        -webkit-background-clip: text;
         background-image: linear-gradient(to right, #EC4899, #F472B6);
+        color: transparent;
       }
       .float {
         animation: float 6s infinite ease-in-out;
@@ -104,7 +108,7 @@
   <!-- 音乐资源 -->
   <audio id="bgMusic" loop preload="auto">
     <source src="https://cdn.jsdelivr.net/gh/13703897128/lovestory.github.io/love.mp3" type="audio/mpeg">
-  </audio>
+  </think>
 
   <!-- 头部内容 -->
   <header class="relative pt-20 pb-16 px-6 text-center z-10">
@@ -165,7 +169,7 @@
   <section class="relative z-10 max-w-4xl mx-auto px-6 mb-16 opacity-0" id="love-essay">
     <div class="bg-white/80 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-romantic-rose/30">
       <h2 class="font-script text-[clamp(1.8rem,4vw,2.5rem)] text-romantic-red text-center mb-8">
-        三周年的碎碎念：关于爱与时光的一万字情书
+        三周年的碎碎念：关于爱与时光的情书
       </h2>
       <div class="text-gray-700 leading-relaxed font-serif space-y-6">
         <p>2022年8月15日，下午三点十五分。我坐在「转角咖啡」靠窗的位置，指尖因为紧张反复摩挲着咖啡杯壁。约定的时间过了两分钟，玻璃门被推开，风铃轻响，你穿着白裙走进来，阳光恰好落在你的发梢，那一刻世界像被按下了慢放键。</p>
@@ -325,44 +329,44 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // 歌词数据（修正时间点确保同步）
+      // 歌词数据（精确匹配歌曲时间）
       const lyrics = [
-        { time: 24, text: "塞纳河畔 左岸的咖啡" },
-        { time: 27, text: "我手一杯 品尝你的美" },
-        { time: 29, text: "留下唇印的嘴" },
-        { time: 35, text: "花店玫瑰 名字写错谁" },
-        { time: 37, text: "告白气球 风吹到对街" },
-        { time: 40, text: "微笑在天上飞" },
-        { time: 44, text: "你说你有点难追 想让我知难而退" },
-        { time: 50, text: "礼物不需挑最贵 只要香榭的落叶" },
-        { time: 55, text: "喔 营造浪漫的约会" },
-        { time: 58, text: "不害怕搞砸一切" },
-        { time: 60, text: "拥有你就拥有 全世界" },
-        { time: 65, text: "亲爱的 爱上你 从那天起" },
-        { time: 72, text: "甜蜜的很轻易" },
-        { time: 76, text: "亲爱的 别任性 你的眼睛" },
-        { time: 82, text: "在说我愿意" },
-        { time: 109, text: "塞纳河畔 左岸的咖啡" },
-        { time: 113, text: "我手一杯 品尝你的美" },
-        { time: 115, text: "留下唇印的嘴" },
-        { time: 120, text: "花店玫瑰 名字写错谁" },
-        { time: 122, text: "告白气球 风吹到对街" },
-        { time: 126, text: "微笑在天上飞" },
-        { time: 130, text: "你说你有点难追 想让我知难而退" },
-        { time: 135, text: "礼物不需挑最贵 只要香榭的落叶" },
-        { time: 140, text: "喔 营造浪漫的约会" },
-        { time: 143, text: "不害怕搞砸一切" },
-        { time: 146, text: "拥有你就拥有 全世界" },
-        { time: 151, text: "亲爱的 爱上你 从那天起" },
-        { time: 156, text: "甜蜜的很轻易" },
-        { time: 160, text: "亲爱的 别任性 你的眼睛" },
-        { time: 167, text: "在说我愿意" },
-        { time: 171, text: "亲爱的 爱上你 恋爱日记" },
-        { time: 175, text: "飘香水的回忆" },
-        { time: 178, text: "一整瓶 的梦境 全都有你" },
-        { time: 184, text: "搅拌在一起" },
-        { time: 188, text: "亲爱的别任性 你的眼睛" },
-        { time: 197, text: "在说我愿意" }
+        { time: 24.0, text: "塞纳河畔 左岸的咖啡" },
+        { time: 27.0, text: "我手一杯 品尝你的美" },
+        { time: 29.0, text: "留下唇印的嘴" },
+        { time: 35.0, text: "花店玫瑰 名字写错谁" },
+        { time: 37.0, text: "告白气球 风吹到对街" },
+        { time: 40.0, text: "微笑在天上飞" },
+        { time: 44.0, text: "你说你有点难追 想让我知难而退" },
+        { time: 50.0, text: "礼物不需挑最贵 只要香榭的落叶" },
+        { time: 55.0, text: "喔 营造浪漫的约会" },
+        { time: 58.0, text: "不害怕搞砸一切" },
+        { time: 60.0, text: "拥有你就拥有 全世界" },
+        { time: 65.0, text: "亲爱的 爱上你 从那天起" },
+        { time: 72.0, text: "甜蜜的很轻易" },
+        { time: 76.0, text: "亲爱的 别任性 你的眼睛" },
+        { time: 82.0, text: "在说我愿意" },
+        { time: 109.0, text: "塞纳河畔 左岸的咖啡" },
+        { time: 113.0, text: "我手一杯 品尝你的美" },
+        { time: 115.0, text: "留下唇印的嘴" },
+        { time: 120.0, text: "花店玫瑰 名字写错谁" },
+        { time: 122.0, text: "告白气球 风吹到对街" },
+        { time: 126.0, text: "微笑在天上飞" },
+        { time: 130.0, text: "你说你有点难追 想让我知难而退" },
+        { time: 135.0, text: "礼物不需挑最贵 只要香榭的落叶" },
+        { time: 140.0, text: "喔 营造浪漫的约会" },
+        { time: 143.0, text: "不害怕搞砸一切" },
+        { time: 146.0, text: "拥有你就拥有 全世界" },
+        { time: 151.0, text: "亲爱的 爱上你 从那天起" },
+        { time: 156.0, text: "甜蜜的很轻易" },
+        { time: 160.0, text: "亲爱的 别任性 你的眼睛" },
+        { time: 167.0, text: "在说我愿意" },
+        { time: 171.0, text: "亲爱的 爱上你 恋爱日记" },
+        { time: 175.0, text: "飘香水的回忆" },
+        { time: 178.0, text: "一整瓶 的梦境 全都有你" },
+        { time: 184.0, text: "搅拌在一起" },
+        { time: 188.0, text: "亲爱的别任性 你的眼睛" },
+        { time: 197.0, text: "在说我愿意" }
       ];
 
       // 全局变量
@@ -436,11 +440,11 @@
         const allChars = [];
         lyrics.forEach((line) => {
           const lineEl = document.createElement('div');
-          lineEl.className = 'py-2 font-serif text-lg';
+          lineEl.className = 'py-3 font-serif text-lg';
           
           line.text.split('').forEach((char, charIdx) => {
             const charEl = document.createElement('span');
-            charEl.className = 'lyric-char lyric-char-unplayed text-gradient mx-0.5';
+            charEl.className = 'text-gradient-unplayed mx-0.5';
             charEl.textContent = char;
             charEl.dataset.charTime = line.time + (charIdx * 0.15);
             lineEl.appendChild(charEl);
@@ -473,11 +477,11 @@
           // 更新字符状态
           allChars.forEach((item, idx) => {
             if (idx < currentCharIndex) {
-              item.el.className = 'lyric-char lyric-char-played text-gradient mx-0.5';
+              item.el.className = 'text-gradient-played mx-0.5';
             } else if (idx === currentCharIndex) {
-              item.el.className = 'lyric-char lyric-char-playing text-gradient mx-0.5';
+              item.el.className = 'text-gradient-playing mx-0.5';
             } else {
-              item.el.className = 'lyric-char lyric-char-unplayed text-gradient mx-0.5';
+              item.el.className = 'text-gradient-unplayed mx-0.5';
             }
           });
 
