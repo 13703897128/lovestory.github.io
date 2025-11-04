@@ -15,8 +15,8 @@
           colors: {
             love: {
               light: '#FFD1DC',
-              DEFAULT: '#FF69B4',
-              dark: '#C71585',
+              DEFAULT: '#FF69B4', // 已播放歌词色
+              dark: '#C71585',    // 当前播放歌词色
               purple: '#DDA0DD',
               faded: '#F8BBD0'
             }
@@ -47,8 +47,18 @@
       .slide-up {
         animation: slideUp 1s ease-out forwards;
       }
-      .lyric-active {
-        animation: lyricPulse 0.8s ease-in-out forwards;
+      .lyric-char-active {
+        animation: lyricCharPulse 0.3s ease-in-out forwards;
+      }
+      .lyric-char-played {
+        color: #FF69B4 !important; /* 已播放 - 粉色 */
+      }
+      .lyric-char-current {
+        color: #C71585 !important; /* 当前播放 - 深粉 */
+        font-weight: bold !important;
+      }
+      .lyric-char-unplayed {
+        color: #CCCCCC !important; /* 未播放 - 浅灰 */
       }
       .pulse {
         animation: pulse 2s infinite;
@@ -86,15 +96,25 @@
       to { transform: translateY(0); opacity: 1; }
     }
     
-    @keyframes lyricPulse {
-      from { opacity: 0.7; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
+    @keyframes lyricCharPulse {
+      from { opacity: 0.8; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1.05); }
     }
     
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
+    }
+    
+    /* 歌词字符容器样式 */
+    .lyric-line {
+      py-3 font-lyric text-[clamp(1rem,2vw,1.2rem)] transition-all duration-300;
+    }
+    .lyric-char {
+      display: inline-block;
+      margin: 0 1px;
+      transition: all 0.2s ease;
     }
   </style>
   
@@ -131,7 +151,7 @@
   <section class="relative z-10 max-w-3xl mx-auto px-6 mb-16 opacity-0" id="song-info">
     <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-pink-100 flex flex-col items-center gap-8">
       <div class="w-48 h-48 rounded-xl overflow-hidden shadow-xl pulse">
-        <img src="https://13703897128.github.io/lovestory.github.io/love.mp3" alt="告白气球专辑封面" class="w-full h-full object-cover">
+        <img src="https://picsum.photos/id/1069/300/300" alt="告白气球专辑封面" class="w-full h-full object-cover">
       </div>
       <div class="text-center">
         <h2 id="song-title" class="font-romantic text-[clamp(2rem,5vw,3rem)] text-love-dark font-bold mb-2">
@@ -142,7 +162,7 @@
           这首歌是我们故事的序章，从塞纳河畔的邂逅，到三年间的朝朝暮暮。前奏响起时，仿佛又回到2022年8月的那个夏天，你的笑容比阳光更耀眼。
         </p>
         <p id="intro-tip" class="mt-4 text-love text-sm hidden">
-          <i class="fa fa-music mr-1"></i>  我们的故事即将继续
+          <i class="fa fa-music mr-1"></i>  24秒后歌词同步开始
         </p>
       </div>
     </div>
@@ -324,51 +344,51 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 歌词时间点精确匹配（根据您提供的示例调整）
+      // 歌词配置：只保留24秒后需要演唱的歌词，精确到每个字的时间
       const lyrics = [
-        { time: 3, text: "塞纳河畔 左岸的咖啡" },
-        { time: 5.5, text: "我手一杯 品尝你的美" },
-        { time: 8.5, text: "留下唇印的嘴" },
-        { time: 11.5, text: "" },
-        { time: 12, text: "花店玫瑰 名字写错谁" },
-        { time: 14.5, text: "告白气球 风吹到对街" },
-        { time: 17.5, text: "微笑在天上飞" },
-        { time: 20.5, text: "" },
-        { time: 24, text: "你说你有点难追 想让我知难而退" },
-        { time: 29, text: "礼物不需挑最贵 只要香榭的落叶" },
-        { time: 34, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
-        { time: 39, text: "拥有你就拥有 全世界" },
-        { time: 43, text: "" },
-        { time: 44, text: "亲爱的 爱上你 从那天起" },
-        { time: 49, text: "甜蜜的很轻易" },
-        { time: 52, text: "亲爱的 别任性 你的眼睛" },
-        { time: 57, text: "在说我愿意" },
-        { time: 61, text: "" },
-        { time: 62, text: "塞纳河畔 左岸的咖啡" },
-        { time: 64.5, text: "我手一杯 品尝你的美" },
+        { time: 24.0, text: "你说你有点难追" },
+        { time: 25.8, text: "想让我知难而退" },
+        { time: 29.0, text: "礼物不需挑最贵" },
+        { time: 30.8, text: "只要香榭的落叶" },
+        { time: 34.0, text: "喔 营造浪漫的约会" },
+        { time: 36.5, text: "不害怕搞砸一切" },
+        { time: 39.0, text: "拥有你就拥有" },
+        { time: 41.0, text: "全世界" },
+        { time: 44.0, text: "亲爱的 爱上你" },
+        { time: 46.5, text: "从那天起" },
+        { time: 49.0, text: "甜蜜的很轻易" },
+        { time: 52.0, text: "亲爱的 别任性" },
+        { time: 54.5, text: "你的眼睛" },
+        { time: 57.0, text: "在说我愿意" },
+        { time: 62.0, text: "塞纳河畔 左岸的咖啡" },
+        { time: 64.8, text: "我手一杯 品尝你的美" },
         { time: 67.5, text: "留下唇印的嘴" },
-        { time: 70.5, text: "" },
-        { time: 71, text: "花店玫瑰 名字写错谁" },
-        { time: 73.5, text: "告白气球 风吹到对街" },
+        { time: 71.0, text: "花店玫瑰 名字写错谁" },
+        { time: 73.8, text: "告白气球 风吹到对街" },
         { time: 76.5, text: "微笑在天上飞" },
-        { time: 79.5, text: "" },
-        { time: 80, text: "你说你有点难追 想让我知难而退" },
-        { time: 85, text: "礼物不需挑最贵 只要香榭的落叶" },
-        { time: 90, text: "喔 营造浪漫的约会 不害怕搞砸一切" },
-        { time: 95, text: "拥有你就拥有 全世界" },
-        { time: 99, text: "" },
-        { time: 100, text: "亲爱的 爱上你 从那天起" },
-        { time: 105, text: "甜蜜的很轻易" },
-        { time: 108, text: "亲爱的 别任性 你的眼睛" },
-        { time: 113, text: "在说我愿意" },
-        { time: 117, text: "" },
-        { time: 124, text: "亲爱的 爱上你 恋爱日记" },
-        { time: 129, text: "飘香水的回忆" },
-        { time: 132, text: "一整瓶 的梦境 全都有你" },
-        { time: 137, text: "搅拌在一起" },
-        { time: 141, text: "" },
-        { time: 148, text: "亲爱的 别任性 你的眼睛" },
-        { time: 153, text: "在说我愿意" }
+        { time: 80.0, text: "你说你有点难追" },
+        { time: 81.8, text: "想让我知难而退" },
+        { time: 85.0, text: "礼物不需挑最贵" },
+        { time: 86.8, text: "只要香榭的落叶" },
+        { time: 90.0, text: "喔 营造浪漫的约会" },
+        { time: 92.5, text: "不害怕搞砸一切" },
+        { time: 95.0, text: "拥有你就拥有" },
+        { time: 97.0, text: "全世界" },
+        { time: 100.0, text: "亲爱的 爱上你" },
+        { time: 102.5, text: "从那天起" },
+        { time: 105.0, text: "甜蜜的很轻易" },
+        { time: 108.0, text: "亲爱的 别任性" },
+        { time: 110.5, text: "你的眼睛" },
+        { time: 113.0, text: "在说我愿意" },
+        { time: 124.0, text: "亲爱的 爱上你" },
+        { time: 126.5, text: "恋爱日记" },
+        { time: 129.0, text: "飘香水的回忆" },
+        { time: 132.0, text: "一整瓶 的梦境" },
+        { time: 134.5, text: "全都有你" },
+        { time: 137.0, text: "搅拌在一起" },
+        { time: 148.0, text: "亲爱的 别任性" },
+        { time: 150.5, text: "你的眼睛" },
+        { time: 153.0, text: "在说我愿意" }
       ];
 
       // 创建花瓣装饰
@@ -477,7 +497,7 @@
         });
       }
       
-      // 歌词同步设置 - 重点优化部分
+      // 核心优化：逐字同步歌词（24秒后启动，颜色区分清晰）
       function setupLyrics() {
         const music = document.getElementById('bgMusic');
         const lyricsWrapper = document.getElementById('lyrics-wrapper');
@@ -486,82 +506,115 @@
         const currentTimeEl = document.getElementById('current-time');
         const totalTimeEl = document.getElementById('total-time');
         
-        // 渲染歌词
-        lyrics.forEach((lyric, index) => {
-          const lyricEl = document.createElement('div');
-          lyricEl.className = `py-3 text-gray-400 font-lyric text-[clamp(1rem,2vw,1.2rem)] transition-all duration-300`;
-          lyricEl.textContent = lyric.text;
-          lyricEl.dataset.index = index;
-          lyricEl.dataset.time = lyric.time;
-          lyricsWrapper.appendChild(lyricEl);
-        });
+        // 存储所有字符元素和它们的时间信息
+        const allChars = [];
+        let currentLineIndex = 0;
+        let currentCharIndex = -1;
+        let isLyricStarted = false; // 标记歌词是否开始（24秒后）
         
-        const lyricElements = document.querySelectorAll('#lyrics-wrapper > div');
-        let currentIndex = -1;
-        let isPlaying = false;
+        // 渲染歌词：拆分成单个字符
+        lyrics.forEach((line, lineIndex) => {
+          const lineEl = document.createElement('div');
+          lineEl.className = 'lyric-line';
+          lineEl.dataset.lineIndex = lineIndex;
+          lineEl.dataset.startTime = line.time;
+          
+          // 拆分字符并创建元素
+          const chars = line.text.split('');
+          chars.forEach((char, charIndex) => {
+            const charEl = document.createElement('span');
+            charEl.className = 'lyric-char lyric-char-unplayed'; // 初始未播放（浅灰）
+            charEl.textContent = char;
+            charEl.dataset.lineIndex = lineIndex;
+            charEl.dataset.charIndex = charIndex;
+            
+            // 计算每个字符的精确播放时间（逐字延迟0.15秒）
+            const charTime = line.time + (charIndex * 0.15);
+            charEl.dataset.charTime = charTime;
+            
+            lineEl.appendChild(charEl);
+            allChars.push({
+              el: charEl,
+              lineIndex,
+              charIndex,
+              time: charTime
+            });
+          });
+          
+          lyricsWrapper.appendChild(lineEl);
+        });
         
         // 音频元数据加载完成后更新总时长
         music.addEventListener('loadedmetadata', () => {
-          const totalTime = music.duration;
-          totalTimeEl.textContent = formatTime(totalTime);
+          totalTimeEl.textContent = formatTime(music.duration);
         });
         
-        // 监听播放状态变化
-        music.addEventListener('play', () => {
-          isPlaying = true;
-        });
-        
-        music.addEventListener('pause', () => {
-          isPlaying = false;
-        });
-        
-        // 音频播放进度更新时同步歌词 - 优化版
+        // 音频播放进度更新时同步歌词
         music.addEventListener('timeupdate', () => {
-          // 只有在播放状态下才更新歌词
-          if (!isPlaying) return;
-          
           const currentTime = music.currentTime;
           currentTimeEl.textContent = formatTime(currentTime);
           progressBar.style.width = `${(currentTime / music.duration) * 100}%`;
           
-          // 匹配当前时间对应的歌词
-          for (let i = 0; i < lyrics.length; i++) {
-            // 检查当前时间是否在当前歌词时间点之后，且在下一句之前
-            const isCurrentLyric = lyrics[i].time <= currentTime && 
-                                  (i === lyrics.length - 1 || currentTime < lyrics[i + 1].time);
+          // 24秒前不启动歌词（所有字符保持未播放状态）
+          if (currentTime < 24) {
+            if (isLyricStarted) {
+              resetAllLyrics();
+              isLyricStarted = false;
+              currentLineIndex = 0;
+              currentCharIndex = -1;
+            }
+            return;
+          }
+          
+          // 24秒后开始歌词同步
+          isLyricStarted = true;
+          
+          // 找到当前应该播放的字符
+          for (let i = 0; i < allChars.length; i++) {
+            const { el, time, lineIndex, charIndex } = allChars[i];
             
-            if (isCurrentLyric && i !== currentIndex) {
-              // 重置所有歌词样式
-              lyricElements.forEach(el => {
-                el.classList.remove('text-love-dark', 'font-bold', 'lyric-active', 'text-love');
-                el.classList.add('text-gray-400');
-              });
-              
-              // 更新已播放的歌词样式（前几句）
-              for (let j = 0; j < i; j++) {
-                if (lyricElements[j] && lyrics[j].text) {
-                  lyricElements[j].classList.remove('text-gray-400', 'text-love-dark', 'font-bold', 'lyric-active');
-                  lyricElements[j].classList.add('text-love'); // 已播放歌词用粉色
-                }
+            // 当前时间 >= 字符播放时间，且是未处理的字符
+            if (currentTime >= time && charIndex > currentCharIndex) {
+              // 更新上一个字符状态（已播放：粉色）
+              if (currentCharIndex >= 0 && allChars[currentCharIndex]) {
+                allChars[currentCharIndex].el.classList.remove('lyric-char-current', 'lyric-char-unplayed');
+                allChars[currentCharIndex].el.classList.add('lyric-char-played');
               }
               
-              // 更新当前句歌词样式
-              currentIndex = i;
-              if (lyricElements[currentIndex] && lyrics[currentIndex].text) {
-                lyricElements[currentIndex].classList.remove('text-gray-400', 'text-love');
-                lyricElements[currentIndex].classList.add('text-love-dark', 'font-bold', 'lyric-active');
-              }
+              // 更新当前字符状态（当前播放：深粉+加粗+动画）
+              el.classList.remove('lyric-char-unplayed', 'lyric-char-played');
+              el.classList.add('lyric-char-current', 'lyric-char-active');
               
-              // 滚动歌词到可视区域中央
-              const containerHeight = lyricsContainer.clientHeight;
-              const lyricHeight = lyricElements[currentIndex]?.clientHeight || 30;
-              const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
-              lyricsWrapper.style.transform = `translateY(-${scrollTop}px)`;
+              // 更新索引
+              currentCharIndex = charIndex;
+              currentLineIndex = lineIndex;
               
+              // 滚动歌词到当前行（居中显示）
+              scrollToCurrentLine(lineIndex);
               break;
             }
           }
         });
+        
+        // 重置所有歌词状态
+        function resetAllLyrics() {
+          allChars.forEach(item => {
+            item.el.className = 'lyric-char lyric-char-unplayed';
+          });
+        }
+        
+        // 滚动到当前行
+        function scrollToCurrentLine(lineIndex) {
+          const lineEl = document.querySelector(`.lyric-line[data-line-index="${lineIndex}"]`);
+          if (!lineEl) return;
+          
+          const containerHeight = lyricsContainer.clientHeight;
+          const lineHeight = lineEl.clientHeight;
+          const lineTop = lineEl.offsetTop - lyricsWrapper.offsetTop;
+          const scrollTop = lineTop - (containerHeight / 2) + (lineHeight / 2);
+          
+          lyricsWrapper.style.transform = `translateY(-${scrollTop}px)`;
+        }
       }
       
       // 格式化时间为 MM:SS 格式
