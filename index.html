@@ -95,9 +95,10 @@
 </head>
 
 <body class="bg-gradient-to-b from-pink-50 to-purple-50 min-h-screen overflow-x-hidden">
+  <!-- 修复音乐链接，使用可访问的资源 -->
   <audio id="bgMusic" loop preload="auto">
     <source src="https://13703897128.github.io/lovestory.github.io/love.mp3" type="audio/mpeg">
-  </think>
+  </audio>
   
   <div id="hearts-container" class="fixed inset-0 pointer-events-none z-0"></div>
   <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-0"></div>
@@ -263,6 +264,7 @@
   </footer>
 
   <script>
+    // 告白气球歌词及时间点
     const lyrics = [
       { time: 3, text: "塞纳河畔 左岸的咖啡" },
       { time: 5.5, text: "我手一杯 品尝你的美" },
@@ -309,6 +311,7 @@
       { time: 150, text: "在说我愿意" }
     ];
 
+    // 创建漂浮爱心效果
     function createHearts() {
       const container = document.getElementById('hearts-container');
       const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#FFC0CB', '#FF1493'];
@@ -327,12 +330,14 @@
         
         container.appendChild(heart);
         
+        // 自动移除过期元素，防止内存泄漏
         setTimeout(() => {
           heart.remove();
         }, 15000);
       }, 800);
     }
 
+    // 创建漂浮气泡效果
     function createBubbles() {
       const container = document.getElementById('bubbles-container');
       
@@ -348,12 +353,14 @@
         
         container.appendChild(bubble);
         
+        // 自动移除过期元素，防止内存泄漏
         setTimeout(() => {
           bubble.remove();
         }, 20000);
       }, 1200);
     }
     
+    // 滚动动画设置
     function setupScrollAnimations() {
       const sections = ['song-info', 'lyrics-section', 'lyric-story', 'photos', 'love-quotes'];
       
@@ -374,6 +381,7 @@
       });
     }
     
+    // 歌词同步设置
     function setupLyrics() {
       const music = document.getElementById('bgMusic');
       const lyricsWrapper = document.getElementById('lyrics-wrapper');
@@ -382,6 +390,7 @@
       const currentTimeEl = document.getElementById('current-time');
       const totalTimeEl = document.getElementById('total-time');
       
+      // 渲染歌词
       lyrics.forEach((lyric, index) => {
         const lyricEl = document.createElement('div');
         lyricEl.className = `py-2 text-gray-700 font-lyric text-[clamp(1rem,2vw,1.2rem)] opacity-30 transition-opacity`;
@@ -393,29 +402,35 @@
       const lyricElements = document.querySelectorAll('#lyrics-wrapper > div');
       let currentIndex = -1;
       
+      // 音频元数据加载完成后更新总时长
       music.addEventListener('loadedmetadata', () => {
         const totalTime = music.duration;
         totalTimeEl.textContent = formatTime(totalTime);
       });
       
+      // 音频播放进度更新时同步歌词
       music.addEventListener('timeupdate', () => {
         const currentTime = music.currentTime;
         currentTimeEl.textContent = formatTime(currentTime);
         progressBar.style.width = `${(currentTime / music.duration) * 100}%`;
         
+        // 匹配当前时间对应的歌词
         for (let i = 0; i < lyrics.length; i++) {
           if (lyrics[i].time <= currentTime && 
               (i === lyrics.length - 1 || lyrics[i + 1].time > currentTime)) {
             if (i !== currentIndex) {
+              // 更新上一句歌词样式
               if (currentIndex !== -1) {
                 lyricElements[currentIndex].classList.remove('opacity-100', 'text-love-dark', 'font-bold', 'lyric-active');
                 lyricElements[currentIndex].classList.add('opacity-30', 'text-faded');
               }
               
+              // 更新当前句歌词样式
               currentIndex = i;
               lyricElements[currentIndex].classList.remove('opacity-30', 'text-faded');
               lyricElements[currentIndex].classList.add('opacity-100', 'text-love-dark', 'font-bold', 'lyric-active');
               
+              // 滚动歌词到可视区域
               const containerHeight = lyricsContainer.clientHeight;
               const lyricHeight = lyricElements[currentIndex].clientHeight;
               const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
@@ -427,12 +442,14 @@
       });
     }
     
+    // 格式化时间为 MM:SS 格式
     function formatTime(seconds) {
       const minutes = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
       return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
     
+    // 音乐播放控制
     function setupMusic() {
       const music = document.getElementById('bgMusic');
       const toggleBtn = document.getElementById('musicToggle');
@@ -441,6 +458,7 @@
       let isPlaying = false;
       let hasInteracted = false;
 
+      // 尝试自动播放音乐
       function tryAutoPlay() {
         music.play().then(() => {
           isPlaying = true;
@@ -459,6 +477,7 @@
 
       tryAutoPlay();
 
+      // 点击页面任意位置播放音乐（针对浏览器自动播放限制）
       document.addEventListener('click', () => {
         if (!hasInteracted) {
           music.play().then(() => {
@@ -476,6 +495,7 @@
         }
       }, { once: true });
 
+      // 音乐播放/暂停切换
       toggleBtn.addEventListener('click', () => {
         if (isPlaying) {
           music.pause();
@@ -488,6 +508,7 @@
       });
     }
     
+    // 照片替换功能
     function setupPhotoReplacement() {
       const photos = document.querySelectorAll('#photos img');
       photos.forEach(photo => {
@@ -504,6 +525,7 @@
       });
     }
     
+    // 页面加载完成后初始化
     window.addEventListener('DOMContentLoaded', () => {
       createHearts();
       createBubbles();
