@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我们的故事</title>
-  <script src="https://13703897128.github.io/lovestory.github.io/love.mp3"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
   <!-- 配置Tailwind自定义颜色和字体 -->
@@ -86,9 +86,9 @@
 </head>
 
 <body class="bg-gradient-to-b from-pink-50 to-purple-50 min-h-screen overflow-x-hidden">
-  <!-- 更换为永久稳定的音频源（网易云音乐外链） -->
+  <!-- 音乐链接已修改为你的仓库路径（确保love.mp3已上传到仓库根目录） -->
   <audio id="bgMusic" loop preload="auto">
-  <source src="https://13703897128.github.io/love.mp3" type="audio/mpeg">
+    <source src="https://13703897128.github.io/lovestory.github.io/love.mp3" type="audio/mpeg">
   </audio>
   
   <!-- 漂浮爱心元素 -->
@@ -105,6 +105,7 @@
     <div class="mt-8 flex justify-center">
       <i class="fa fa-heart text-love text-4xl heart-beat"></i>
     </div>
+    <!-- 提示用户点击页面（若自动播放失败） -->
     <p id="playTip" class="mt-4 text-gray-500 text-sm fade-in" style="animation-delay: 1s">
       点击页面任意位置开启浪漫旋律 ❤️
     </p>
@@ -137,33 +138,28 @@
       </div>
     </section>
 
-    <!-- 照片展示区（图片链接已正确设置） -->
+    <!-- 照片展示区（支持路过图床替换） -->
     <section class="mb-20 opacity-0" id="photos">
       <h2 class="font-romantic text-[clamp(1.8rem,4vw,2.5rem)] text-love-dark text-center mb-10">
         珍贵的回忆
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://imgtu.com/uploads/5hcg7sxi/r-pasted-2025-11-03t12-28-53-203z.webp" 
-               alt="我们的回忆" 
-               class="w-full h-64 object-cover">
+          <img src="https://picsum.photos/id/1025/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
         </div>
         <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://imgtu.com/uploads/5i5oyjmb/r-pasted-2025-11-03t12-46-28-026z.webp" 
-               alt="我们的回忆" 
-               class="w-full h-64 object-cover">
+          <img src="https://picsum.photos/id/1062/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
         </div>
         <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://imgtu.com/uploads/5i5mqaux/r-pasted-2025-11-03t12-46-16-450z.webp" 
-               alt="我们的回忆" 
-               class="w-full h-64 object-cover">
+          <img src="https://picsum.photos/id/1082/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
         </div>
         <div class="rounded-xl overflow-hidden shadow-lg transform transition-transform hover:scale-105">
-          <img src="https://imgtu.com/uploads/5i5q9me4/r-pasted-2025-11-03t12-46-30-219z.webp" 
-               alt="我们的回忆" 
-               class="w-full h-64 object-cover">
+          <img src="https://picsum.photos/id/177/600/400" alt="我们的回忆" class="w-full h-64 object-cover">
         </div>
       </div>
+      <p class="text-center text-gray-500 mt-4 text-sm">
+        （点击照片可替换为你们的回忆，推荐使用路过图床获取图片链接）
+      </p>
     </section>
 
     <!-- 时间线与故事 -->
@@ -281,14 +277,14 @@
 
   <!-- 页脚 -->
   <footer class="relative z-10 py-8 text-center text-gray-500 text-sm">
-    <p>用爱编织的时光 &copy; 2025</p>
+    <p>用爱编织的时光 &copy; 2023</p>
     <button id="musicToggle" class="mt-4 text-love hover:text-love-dark transition-colors">
       <i class="fa fa-pause mr-1"></i> 暂停音乐
     </button>
   </footer>
 
   <script>
-    // 《告白气球》歌词带时间戳
+    // 《告白气球》歌词带时间戳（秒）
     const lyrics = [
       { time: 0, text: "塞纳河畔 左岸的咖啡" },
       { time: 2.5, text: "我手一杯 品尝你的美" },
@@ -335,7 +331,7 @@
       { time: 147, text: "在说我愿意" }
     ];
 
-    // 漂浮爱心功能
+    // 创建漂浮爱心
     function createHearts() {
       const container = document.getElementById('hearts-container');
       const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#FFC0CB', '#FF1493'];
@@ -353,13 +349,18 @@
         heart.style.zIndex = '0';
         
         container.appendChild(heart);
-        setTimeout(() => heart.remove(), 15000);
+        
+        // 移除超出屏幕的爱心
+        setTimeout(() => {
+          heart.remove();
+        }, 15000);
       }, 800);
     }
     
     // 滚动动画
     function setupScrollAnimations() {
       const sections = ['lyrics-section', 'intro', 'photos', 'timeline', 'love-letter'];
+      
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -371,16 +372,19 @@
       
       sections.forEach(sectionId => {
         const section = document.getElementById(sectionId);
-        if (section) observer.observe(section);
+        if (section) {
+          observer.observe(section);
+        }
       });
     }
     
-    // 歌词同步
+    // 歌词同步功能
     function setupLyrics() {
       const music = document.getElementById('bgMusic');
       const lyricsWrapper = document.getElementById('lyrics-wrapper');
       const lyricsContainer = document.getElementById('lyrics-container');
       
+      // 初始化歌词DOM
       lyrics.forEach((lyric, index) => {
         const lyricEl = document.createElement('div');
         lyricEl.className = `py-2 text-gray-700 font-lyric text-[clamp(1rem,2vw,1.2rem)] opacity-30 transition-opacity`;
@@ -392,20 +396,27 @@
       const lyricElements = document.querySelectorAll('#lyrics-wrapper > div');
       let currentIndex = -1;
       
+      // 监听音乐播放进度
       music.addEventListener('timeupdate', () => {
         const currentTime = music.currentTime;
+        
+        // 找到当前应显示的歌词
         for (let i = 0; i < lyrics.length; i++) {
-          if (lyrics[i].time <= currentTime && (i === lyrics.length - 1 || lyrics[i + 1].time > currentTime)) {
+          if (lyrics[i].time <= currentTime && 
+              (i === lyrics.length - 1 || lyrics[i + 1].time > currentTime)) {
             if (i !== currentIndex) {
+              // 重置上一句歌词样式
               if (currentIndex !== -1) {
                 lyricElements[currentIndex].classList.remove('opacity-100', 'text-love-dark', 'font-bold', 'lyric-fade');
                 lyricElements[currentIndex].classList.add('opacity-30');
               }
               
+              // 设置当前歌词样式
               currentIndex = i;
               lyricElements[currentIndex].classList.remove('opacity-30');
               lyricElements[currentIndex].classList.add('opacity-100', 'text-love-dark', 'font-bold', 'lyric-fade');
               
+              // 滚动到当前歌词（居中显示）
               const containerHeight = lyricsContainer.clientHeight;
               const lyricHeight = lyricElements[currentIndex].clientHeight;
               const scrollTop = (currentIndex * lyricHeight) - (containerHeight / 2) + (lyricHeight / 2);
@@ -417,7 +428,7 @@
       });
     }
     
-    // 音乐播放优化（解决播放失败问题）
+    // 音乐播放功能
     function setupMusic() {
       const music = document.getElementById('bgMusic');
       const toggleBtn = document.getElementById('musicToggle');
@@ -425,30 +436,37 @@
       let isPlaying = false;
       let hasInteracted = false;
 
-      // 强制用户交互后播放（浏览器安全政策要求）
-      function ensurePlay() {
+      // 尝试自动播放
+      function tryAutoPlay() {
         music.play().then(() => {
           isPlaying = true;
           hasInteracted = true;
           playTip.style.display = 'none';
           toggleBtn.innerHTML = '<i class="fa fa-pause mr-1"></i> 暂停音乐';
         }).catch(err => {
-          console.log('播放需要用户交互:', err);
+          console.log('需用户交互后播放:', err);
           playTip.style.display = 'block';
         });
       }
 
-      // 页面加载后不自动播放，仅提示用户点击（避免浏览器拦截）
-      playTip.style.display = 'block';
+      // 页面加载后尝试自动播放
+      tryAutoPlay();
 
       // 点击页面任意位置触发播放
       document.addEventListener('click', () => {
         if (!hasInteracted) {
-          ensurePlay();
+          music.play().then(() => {
+            isPlaying = true;
+            hasInteracted = true;
+            playTip.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fa fa-pause mr-1"></i> 暂停音乐';
+          }).catch(err => {
+            console.log('点击后播放失败，请检查love.mp3是否已上传:', err);
+          });
         }
       }, { once: true });
 
-      // 播放/暂停按钮
+      // 切换播放/暂停
       toggleBtn.addEventListener('click', () => {
         if (isPlaying) {
           music.pause();
@@ -461,21 +479,24 @@
       });
     }
     
-    // 图片替换功能
+    // 照片替换功能
     function setupPhotoReplacement() {
       const photos = document.querySelectorAll('#photos img');
       photos.forEach(photo => {
         photo.addEventListener('click', () => {
-          const newSrc = prompt("请输入图片链接（支持路过图床链接）：");
-          if (newSrc) {
+          const guide = "请先上传照片到路过图床（https://imgtu.com/），获取图片链接后粘贴在此处";
+          const newSrc = prompt(guide);
+          if (newSrc && newSrc.includes('imgtu.com')) {
             photo.src = newSrc;
-            alert('替换成功！若未显示，请刷新页面');
+            alert('照片替换成功！');
+          } else if (newSrc) {
+            alert('请使用路过图床的图片链接（链接需包含imgtu.com）');
           }
         });
       });
     }
     
-    // 初始化
+    // 页面加载完成后初始化
     window.addEventListener('DOMContentLoaded', () => {
       createHearts();
       setupScrollAnimations();
@@ -485,6 +506,4 @@
     });
   </script>
 </body>
-
 </html>
-
